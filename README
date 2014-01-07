@@ -1,0 +1,40 @@
+ADConverter
+
+ADConverter project is based on PmodAD5.
+
+The PmodAD5 is a high resolution analog-to-digital converter built around the Analog Devices AD7193 Sigma-Delta ADC.
+
+The PmodAD5 has ten analog inputs that correspond to eight data lines. The two SMA female connectors route to inputs one and two, while eight standard female header pins route to inputs one through eight.
+
+Customers can set the PmodAD5 into single or continuous conversion mode. The PmodAD5 powers up by default in continuous conversion mode. You can set the mode to start a conversion by either writing to the appropriate registers or on the rising edge of SYNC. 
+
+PmodAD5 is composed of AD7193 device.
+
+ The AD7193 is a low noise, complete analog front end for high precision measurement applications. It
+contains a low noise, 24-bit sigma-delta (Σ-Δ) analog-to-digital converter (ADC). The on-chip low noise
+gain stage means that signals of small amplitude can interface directly to the ADC.
+The device can be configured to have four differential inputs or eight pseudo differential inputs. The
+on-chip channel sequencer allows several channels to be enabled simultaneously, and the AD7193
+sequentially converts on each enabled channel, simplifying communication with the part. The on-chip
+4.92 MHz clock can be used as the clock source to the ADC or, alternatively, an external clock or
+crystal can be used. The output data rate from the part can be varied from 4.7 Hz to 4.8 kHz.
+The device has a very flexible digital filter, including a fast settling option. Variables such as output
+data rate and settling time are dependent on the option selected. The AD7193 also includes a zero
+latency option.
+The part operates with a power supply from 3 V to 5.25 V. It consumes a current of 4.65 mA, and it is
+available in a 28-lead TSSOP package and a 32-lead LFCSP package.
+
+Applications
+
+
+	PLC/DCS analog input modules
+	Data acquisition
+	Strain gage transducers
+	Pressure measurement
+	Temperature measurement
+	Flow measurement
+	Weigh scales
+	Chromatography
+	Medical and scientific instrumentation
+
+

@@ -1,0 +1,548 @@
+\documentclass[10pt,a4paper]{report}
+\usepackage[top=2cm, bottom=3cm, left=3cm, right=3cm]{geometry}
+\usepackage[UKenglish]{babel} 
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{ushort}
+\usepackage{amsfonts}
+\usepackage{calc}
+\usepackage[nottoc, notlof, notlot]{tocbibind}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage{fancyvrb}
+\usepackage{xcolor}
+\usepackage{listings}
+\graphicspath{{img/}}
+
+
+\title{ADConverter\\$\mid$\\$ADConverter$: an open project for\\analog to
+digital convertion}
+\author{Robin Siemiatkowski}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\chapter{Presentation}
+ADConverter project is based on PmodAD5,This is a high resolution analog-to-digital converter built around the Analog Devices AD7193 Sigma-Delta ADC. \ PmodAD5 can be used with Arduino devices or with chipkit devices that are fitted with SPI communication (that project was devellopped with Cerebot Mx3CK(chipkit), Arduino UNO/MEGA/DUE).
+\section{Coponents}
+\subsection{PmodAD5}
+ 
+The PmodAD5 has ten analog inputs that correspond to eight data lines. The two SMA female connectors route to inputs one and two, while eight standard female header pins route to inputs one through eight.
+Customers can set the PmodAD5 into single or continuous conversion mode. The PmodAD5 powers up by default in continuous conversion mode. You can set the mode to start a conversion by either writing to the appropriate registers or on the rising edge of SYNC. 
+PmodAD5 is composed of AD7193 microcontroller.
+
+\begin{center}
+\includegraphics[width=7cm,height=50mm]{PmodAD5}
+\end{center}
+
+\textbf{Spi connection on PmoAd5 :}\\	
+\includegraphics[width=40mm,height=40mm]{spipmodad5}
+\captionof{figure}{\\ Note:The voltage applied to DVDD must be\\ kept between 3.0V and 5.25V in order to avoid\\ damaging the parts used in this circuit}
+
+\subsection{AD7193}
+The AD7193 is a low noise, complete analog front end for high precision measurement applications.\ It contains a low noise, 24-bit sigma-delta (Σ-Δ) analog-to-digital converter (ADC). The on-chip low noise
+gain stage means that signals of small amplitude can interface directly to the ADC.\\
+The device can be configured to have four differential inputs or eight pseudo differential inputs. The on-chip channel sequencer allows several channels to be enabled simultaneously, and the AD7193 sequentially converts on each enabled channel, simplifying communication with the part. The on-chip 4.92 MHz clock can be used as the clock source to the ADC or, alternatively, an external clock or crystal can be used. The output data rate from the part can be varied from 4.7 Hz to 4.8 kHz.\
+The device has a very flexible digital filter, including a fast settling option. Variables such as output data rate and settling time are dependent on the option selected. The AD7193 also includes a zero latency option.
+The part operates with a power supply from 3 V to 5.25 V. It consumes a current of 4.65 mA, and it is available in a 28-lead TSSOP package and a 32-lead LFCSP package.
+
+\subsubsection*{Applications} 
+
+\begin{itemize}
+
+\item PLC/DCS analog input modules
+\item Data acquisition
+\item Strain gage transducers
+\item Pressure measurement
+\item Temperature measurement
+\item Flow measurement
+\item Weigh scales
+\item Chromatography
+\item Medical and scientific instrumentation \\
+
+\end{itemize}
+\section{Plateforms}
+
+The goal of this project was to allow the use of the PmodAD5 on several platforms. For this reason, we tried to develop this project on several micro-controller :
+\begin{itemize}
+\item chipkit Cerebot Mx3ck
+\item Arduino uno / mega 
+\item arduino DUE
+\end{itemize} 
+
+\subsection{Cerebot Mx3ck}
+
+
+
+\includegraphics[width=7cm,height=50mm]{chipkitcerebotmx3ck}
+\includegraphics[width=7cm,height=50mm]{chipkitcerebotmx3ck2}
+
+
+
+
+
+\textbf{Presention of Cerebot MX3ck}
+\textbf{Specifications}
+\begin{itemize}
+\item Microcontroller: PIC32MX320F128H
+\item Flash Memory: 128K
+\item RAM Memory: 16K
+\item Operating Voltage: 3.3V
+\item Max Operating Frequency: 80Mhz
+\item Typical operating current: 75mA
+\item Input Voltage (recommended): 7V to 15V
+\item Input Voltage (maximum): 20V
+\item I/O Pins: 42 total
+\item Analog Inputs: 12
+\item Analog input voltage range: 0V to 3.3V
+\item DC Current per pin: +/-18mA \\
+\end{itemize}
+
+This section presents the steps for developing a chipKIT application that will run on the Digilent Cerebot MX3cK development board for controlling and monitoring the operation of the ADI part.
+To develop our application, we chose to use MPIDE. This is a modifed IDE of Arduino IDE. The reason is that the development of the program with MPIDE (with the library SPI of Arduino and not that of chipkit, the DSPI) is going to bring us to a compatible program with arduino (the most obvious case to have a compatible and simple program), we thus had to install Mpide.
+
+\subsubsection*{How to install MPIDE}
+
+\begin{itemize}
+\item Open a Web browser and navigate to the github for MPIDE \\ Presently held at: \url{https://github.com/chipKIT32/chipKIT32-MAX/downloads}
+\item download mpide-0023-linux-20120903.tgz
+\item extract the file on a folder
+\item Open a terminal, navigate to the location of the extract file
+\item lauch MPIDE with ./mpide command\\
+\end{itemize}
+To be able to compile a program on this card, we must reprogram the bootloader.\\
+
+\textbf{To change the boot loader, you must install MplabX:\\}
+\begin{itemize}
+\item Open a Web browser and navigate to \url{https://www.microchip.com/pagehandler/en-us/family/mplabx/}
+\item download MPLAB X IDE v1.95
+\item open a terminal, navigate to the location of the file downloaded.
+\item execute this command : chmod +x MPLABX-v1.95-linux-installer.run
+\item if you are in 64bit,  it will be impossible to execute the program of installation of MPLAB. It is necessary to install drivers 32 bits:   sudo apt-get install ia32-libs
+\item Now,you can lauch the installation: sudo ./MPLABX-v1.95-linux-installer.run
+\end{itemize}
+\subsubsection*{How to change Bootloader}
+
+/!$\backslash$ you need to have a Chipkit Programmer
+\begin{minipage}[c]{0.1\linewidth}
+    \centering \includegraphics[height=1.5cm,keepaspectratio=true]{chipkitprogrammer}
+\end{minipage}\hfill 
+\\ To reprogram the boot loader using MPLAB,
+perform the following steps: \\
+
+
+\begin{itemize}
+\item download Bootloader folder on Github(RobinSI/ADConverter)
+\item launch MPLAB IPE
+\item in "Slect Device and Tool", select Family: 32-bit MCUs (PIC32) and Device: PIC32MX320F128H.
+\item select the source (browse$\ $chipKIT$\_$Bootloader$\_$MX3ck.hex)
+\item Apply and connect.
+\item Click on Program
+\end{itemize}
+\subsection{Arduino UNO/MEGA}
+To developp our application on an Arduino UNO or an Arduino mega, we use the classic IDE of Arduino. But you must have been changing connection to SPI.
+
+\subsection*{Arduino UNO}
+
+\textbf{Arduino UNO presentaion}\\
+\begin{itemize}
+\item Microcontroller	ATmega328
+\item Operating Voltage	5V
+\item Input Voltage (recommended)	7-12V
+\item Input Voltage (limits)	6-20V
+\item Digital I/O Pins	14 (of which 6 provide PWM output)
+\item Analog Input Pins	6
+\item vDC Current per I/O Pin	40 mA
+\item DC Current for 3.3V Pin	50 mA
+\item Flash Memory	32 KB (ATmega328) of which 0.5 KB used by bootloader
+\item SRAM	2 KB (ATmega328)
+\item EEPROM	1 KB (ATmega328)
+\item Clock Speed	16 MHz
+\end{itemize}
+\begin{center}
+\includegraphics{arduinouno}\\
+\end{center}
+
+\textbf{SPI Connection on Arduino UNO:}
+\begin{itemize}
+\item SPI: 10 (SS), 11 (MOSI), 12 (MISO), 13 (SCK). 
+\end{itemize}
+
+\subsection*{Arduino MEGA}
+
+\textbf{Arduino MEGA presentaion}\\
+\begin{itemize}
+\item Microcontroller	ATmega1280
+\item Operating Voltage	5V
+\item Input Voltage (recommended)	7-12V
+\item Input Voltage (limits)	6-20V
+\item vDigital I/O Pins	54 (of which 15 provide PWM output)
+\item Analog Input Pins	16
+\item DC Current per I/O Pin	40 mA
+\item DC Current for 3.3V Pin	50 mA
+\item Flash Memory	128 KB of which 4 KB used by bootloader
+\item SRAM	8 KB
+\item EEPROM	4 KB
+\item Clock Speed	16 MHz
+\end{itemize}
+\begin{center}
+\includegraphics[width=10cm,height=50mm]{arduinomega}\\
+\end{center}
+\textbf{SPI Connection on Arduino MEGA:}
+\begin{itemize}
+\item SPI: 50 (MISO), 51 (MOSI), 52 (SCK), 53 (SS).
+\end{itemize}
+
+\subsection{Arduino DUE}
+
+\textbf{Arduino DUE presentaion}\\
+\begin{itemize}
+\item Microcontroller	 	AT91SAM3X8E
+\item Operating Voltage	 	3.3V
+\item Input Voltage (recommended)	 	7-12V
+\item Input Voltage (limits)	 	6-16V
+\item Digital I/O Pins	 	54 (of which 12 provide PWM output)
+\item Analog Input Pins	 	12
+\item Analog Outputs Pins	 	2 (DAC)
+\item Total DC Output Current on all I/O lines	 	130 mA
+\item DC Current for 3.3V Pin	 	800 mA
+\item DC Current for 5V Pin	 	800 mA
+\item Flash Memory	 	512 KB all available for the user applications
+\item SRAM	 	96 KB (two banks: 64KB and 32KB)
+\item Clock Speed	 	84 MHz
+\end{itemize}
+
+/!$\backslash$ For using Arduino DUE you need to install Arduino IDE-1.5.4
+
+\begin{center}
+\includegraphics[width=10cm,height=50mm]{arduinodue}\\
+\end{center}
+\textbf{SPI Connection on Arduino DUE:}
+\begin{itemize}
+\item The extended API can use pins 4, 10, and 52 for CS.
+\item SPI: SPI header (ICSP header on other Arduino boards):\\
+\begin{center}
+\includegraphics[width=5cm,height=5cm]{spidue}\\
+\end{center}
+\end{itemize}
+
+\chapter{Basic Program}
+\section{AD7193}
+At the begining, we recovered the generic driver of AD7193, and after debugging, just three functions had to be implemented: 
+\begin{itemize}
+\item SPI$\_$Init
+\item SPI$\_$Read
+\item SPI$\_$Write\\
+\end{itemize}
+
+But those three functions should have been implemented for each micro-controller that we would to use, (each micro-controller have separate register).
+that is why we decided to replace those three functions by functions of the SPI library.
+
+\subsection{SPI Library}
+
+\begin{itemize}
+\item \textbf{SPI.begin() } : Initializes the SPI bus by setting SCK, MOSI, and SS to outputs, pulling SCK and MOSI low, and SS high. \\
+\item \textbf{SPI.transfer(val)} : Transfers one byte over the SPI bus, both sending and receiving.(val:the byte to send out over the bus)  \\
+\item \textbf{SPI.setBitOrder(order)} : Sets the order of the bits shifted out of and into the SPI bus, either LSBFIRST (least-significant bit first) or MSBFIRST (most-significant bit first). \\
+\item \textbf{SPI.setClockDivider(divider)} : Sets the SPI clock divider relative to the system clock. On AVR based boards, the dividers available are 2, 4, 8, 16, 32, 64 or 128. The default setting is SPI$\_$CLOCK$\_$DIV4, which sets the SPI clock to one-quarter the frequency of the system clock (4 Mhz for the boards at 16 MHz). 
+
+\underline{divider:}
+\begin{itemize}
+\item SPI$\_$CLOCK$\_$DIV2
+\item SPI$\_$CLOCK$\_$DIV4
+\item SPI$\_$CLOCK$\_$DIV8
+\item SPI$\_$CLOCK$\_$DIV16
+\item SPI$\_$CLOCK$\_$DIV32
+\item SPI$\_$CLOCK$\_$DIV64
+\item SPI$\_$CLOCK$\_$DIV128 
+\end{itemize}
+
+\item \textbf{SPI.setDataMode(mode)} : Sets the SPI data mode: that is, clock polarity and phase.
+
+\underline{mode:} 
+\begin{itemize}
+\item SPI$\_$MODE0
+\item SPI$\_$MODE1
+\item SPI$\_$MODE2
+\item SPI$\_$MODE3 
+\end{itemize} 
+
+\end{itemize}
+
+\subsection{final AD7193 library}
+
+On the generic driver, four functions need to communicate through the SPI connection :
+
+\begin{itemize}
+\item AD7193$\_$Init()
+\item AD7193$\_$GetRegisterValue()
+\item AD7193$\_$Reset()
+\item AD7193$\_$SetRegisterValue()
+\end{itemize}
+
+ 
+ 
+for example, AD7193$\_$SetRegisterValue() function for Cerebot Mx3ck :
+
+
+\lstset { %
+    language=C++,
+    backgroundcolor=\color{black!5}, % set backgroundcolor
+    basicstyle=\footnotesize,% basic font setting
+}
+
+
+\begin{lstlisting}
+void AD7193_SetRegisterValue(unsigned char registerAddress,
+                             unsigned long registerValue,
+                             unsigned char bytesNumber,
+                             unsigned char modifyCS)
+{//setregistervalue
+    unsigned char writeCommand[5] = {0, 0, 0, 0, 0};
+    unsigned char* dataPointer    = (unsigned char*)&registerValue;
+    unsigned char bytesNr         = bytesNumber;
+
+    writeCommand[0] = AD7193_COMM_WRITE |
+                      AD7193_COMM_ADDR(registerAddress);
+                   
+    while(bytesNr > 0)
+    {
+        writeCommand[bytesNr] = *dataPointer;
+        dataPointer ++;
+        bytesNr --;
+    }
+    SPI_Write(AD7193_SLAVE_ID * modifyCS, writeCommand, bytesNumber + 1);
+    // write data to SPI
+}//setregistervalue}
+\end{lstlisting}
+
+
+
+\underline{\textbf{This code has been modified using the SPI library.}}\\
+
+\textbf{code for all devices :} \\
+\begin{lstlisting}
+void AD7193_SetRegisterValue(unsigned char registerAddress,
+                              unsigned long registerValue,
+                              unsigned char bytesNumber,
+                              unsigned char modifyCS)
+{//setregistervalue
+    unsigned char commandByte = 0;
+    unsigned char txBuffer[4] = {0, 0, 0 ,0};
+    
+    commandByte = AD7193_COMM_WRITE | AD7193_COMM_ADDR(registerAddress);
+	txBuffer[0] = (registerValue >> 0)  & 0x000000FF;
+	txBuffer[1] = (registerValue >> 8)  & 0x000000FF;
+	txBuffer[2] = (registerValue >> 16) & 0x000000FF;
+	txBuffer[3] = (registerValue >> 24) & 0x000000FF;
+	if(modifyCS == 1)
+	{
+		digitalWrite(PMOD1_CS_PIN, LOW);
+	}
+	SPI.transfer(commandByte);
+    while(bytesNumber > 0)
+    {
+        SPI.transfer(txBuffer[bytesNumber - 1]);
+        bytesNumber--;
+    }
+	if(modifyCS == 1)
+	{
+		digitalWrite(PMOD1_CS_PIN, HIGH);
+	}
+}//setregistervalue
+\end{lstlisting}
+
+The other functions are implemented on sketches available here : \\
+
+\url{https://github.com/RobinSi/ADConverter}
+
+\subsection{AD7193 library for Arduino DUE}
+
+The Arduino Due's SPI interface works differently than any other Arduino boards.
+On the Arduino Due, the SAM3X has advanced SPI capabilities. It is possible to use these extended methods, or the AVR-based ones.
+
+The extended API can use pins 4, 10, and 52 for CS. \\
+
+/!$\backslash$ You must specify each pin you wish to use as CS for the SPI devices.  
+
+\begin{tabular}{|c|c|}
+  \hline
+  \textbf{SPI library} & \textbf{SPI library for Arduino DUE}   \\
+  \hline
+  SPI.begin()  & SPI.begin(slaveSelectPin)  \\
+  \hline
+  SPI.end()  & SPI.end(slaveSelectPin) \\
+  \hline
+  SPI.setClockDivider(divider) & SPI.setClockDivider(slaveSelectPin, divider) \\
+  \hline
+  SPI.setDataMode(mode) & SPI.setDataMode(slaveSelectPin, mode) \\
+  \hline
+  SPI.setBitOrder(order) & SPI.setBitOrder(slaveSelectPin, order)\\
+  \hline
+  SPI.transfer(val) & SPI.transfer(slaveSelectPin, val)\\
+  \hline
+\end{tabular}
+
+\chapter{How to use PmodAD5}
+\section{AD7193 functions}
+The AD7193 library provides several functions for using the PmodAD5.
+\lstset { %
+    language=java,
+    backgroundcolor=\color{white}, % set backgroundcolor
+    basicstyle=\footnotesize,% basic font setting
+}
+
+\begin{tabular}{|l|}
+  \hline
+Resets the device.\\
+\begin{lstlisting} 
+AD7193_Reset(void)
+\end{lstlisting} \\
+\hline
+
+
+Checks if the AD7139 part is present\\
+\begin{lstlisting}
+ AD7193_Init(void)
+\end{lstlisting} \\
+\hline
+
+Selects the channel to be enabled.\\
+\begin{lstlisting}
+AD7193_ChannelSelect(unsigned short channel)
+\end{lstlisting} \\
+\hline
+
+Performs the given calibration to the specified channel.\\
+\begin{lstlisting}
+AD7193_Calibrate(unsigned char mode, unsigned char channel)
+\end{lstlisting} \\
+\hline
+
+Selects the polarity of the conversion and the ADC input range.\\
+\begin{lstlisting}
+AD7193_RangeSetup(unsigned char polarity, unsigned char range)
+\end{lstlisting} \\
+\hline
+Returns the average of several conversion results.\\
+\begin{lstlisting}
+AD7193_ContinuousReadAvg(unsigned char sampleNumber)
+\end{lstlisting}\\
+\hline
+ Converts 24-bit raw data to volts.\\
+\begin{lstlisting}
+AD7193_ConvertToVolts(unsigned long rawData, float vRef)
+\end{lstlisting}\\
+\hline
+Read data from temperature sensor and converts it to Celsius degrees.\\
+\begin{lstlisting}
+AD7193_TemperatureRead(void)
+\end{lstlisting} \\
+\hline
+Returns the result of a single conversion.\\
+\begin{lstlisting}
+AD7193_SingleConversion(void)
+\end{lstlisting} \\
+\hline
+Waits for RDY pin to go low.\\
+\begin{lstlisting}
+AD7193_WaitRdyGoLow(void)
+\end{lstlisting} \\
+\hline
+ Set device to idle or power-down.\\
+\begin{lstlisting}
+AD7193_SetPower(unsigned char pwrMode)
+\end{lstlisting}\\
+\hline
+Selects the AD7193's operating mode.\\
+\begin{lstlisting}
+AD7193_SetMode(unsigned char mode)
+\end{lstlisting} \\
+\hline
+Reads the value of a register.\\
+\begin{lstlisting}
+AD7193_GetRegisterValue(unsigned char registerAddress,
+                        unsigned char bytesNumber,
+                        unsigned char modifyCS)
+\end{lstlisting}\\
+\hline                                       
+
+Writes data into a register\\
+\begin{lstlisting}
+AD7193_SetRegisterValue(unsigned char registerAddress,
+                        unsigned long registerValue,
+                        unsigned char bytesNumber,
+                        unsigned char modifyCS)
+\end{lstlisting}\\
+\hline
+\end{tabular}
+
+\section{Sample application}
+
+The following code allows to measure a voltage (0 to 3.3V) on channel 1.
+\lstset { %
+    language=C++,
+    backgroundcolor=\color{black!5}, % set backgroundcolor
+    basicstyle=\footnotesize,% basic font setting
+}
+
+\begin{lstlisting}
+void setup()
+{//setup
+   unsigned long regValue = 0;
+   Serial.begin(9600);
+   delay(7000);
+  if(AD7193_Init())
+  {
+      Serial.print("AD7193 OK");
+  }
+  else
+  {
+      Serial.print("AD7193 Error");
+  }
+    /*! Resets the device. */
+    AD7193_Reset();
+    Serial.print("\n");
+    Serial.print("reset OK");
+    Serial.print("\n");
+    /*! Select Channel 0 */
+    AD7193_ChannelSelect(AD7193_CH_0);
+    Serial.print("chanel OK");
+    Serial.print("\n");
+    /*! Calibrates channel 0. */
+    AD7193_Calibrate(AD7193_MODE_CAL_INT_ZERO, AD7193_CH_0);
+    Serial.print("calibrate OK");
+    Serial.print("\n");
+    /*! Selects unipolar operation and ADC's input range to +-2.5V. */
+    AD7193_RangeSetup(0, AD7193_CONF_GAIN_1);
+    Serial.print("range OK");
+    Serial.print("\n");
+    /*Set the pseudo bit in configuration register */
+    regValue = AD7193_GetRegisterValue(AD7193_REG_CONF, 3, 1);
+    regValue |= AD7193_CONF_PSEUDO;
+    AD7193_SetRegisterValue(AD7193_REG_CONF, regValue, 3, 1);
+    
+}//setup
+void loop()
+{ 
+  unsigned long data = 0;
+  /*retur an average of 1000 convertion on selected channel*/
+  data = AD7193_ContinuousReadAvg(1000);
+  /*convert binari data to volt*/
+  float volt=AD7193_ConvertToVolts(data,3.3);
+  // wait a while
+  delay(1000);
+  // print the voltage of selected channel
+  Serial.print("volt=");
+  Serial.println(volt,DEC);
+
+}
+\end{lstlisting}
+
+\end{document}
